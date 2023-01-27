@@ -12,8 +12,15 @@ const io = new Server(httpServer, {
 });
 
 io.on('connection', (socket) => {
-  console.log(`User Connected: ${socket.id}`);
-}); // 연결확인
+  socket.onAny((event) => {
+    console.log('⭐️ Socket Event :', event);
+  });
+  console.log(`User Connected: ${socket.id}`); //user socket id
+  socket.on('join-room', (roomName) => {
+    socket.join(roomName); //룸 입장
+    console.log(socket.rooms); //모든 room 정보 조회
+  });
+});
 
 const handleListen = () => console.log(`Listening on http://localhost:3000`);
 httpServer.listen(3000, handleListen);
