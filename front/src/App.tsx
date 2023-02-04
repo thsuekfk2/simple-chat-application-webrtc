@@ -16,6 +16,8 @@ function App() {
   const [roomName, setRoomName] = useState('');
   const [chatArray, setChatArray] = useState<MessageInterface[]>([]);
 
+  const [publicRoomList, setPublicRoomList] = useState([]);
+
   /** 닉네임 onChange 핸들러 */
   const onNicknameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
@@ -53,6 +55,10 @@ function App() {
 
   /** 룸 이름 전송 및 저장 */
   const submitRoomName = () => {
+    //닉네임 미지정 시 초기 닉네임 설정
+    if (inputNickname === '') {
+      setNickname('me');
+    }
     socket.emit('join-room', inputRoomName);
     setRoomName(inputRoomName); //룸 이름 저장
     setInputRoomName('');
@@ -73,6 +79,17 @@ function App() {
       }
     }
   };
+
+  /** 전체 public 룸 조회 소켓 메세지 */
+  useEffect(() => {
+    socket.on('room-change', (publicRoom) => {
+      console.log(publicRoom);
+      setPublicRoomList(publicRoom);
+    });
+    return () => {
+      socket.off('room-change');
+    };
+  }, []);
 
   /** 채팅 소켓 메세지 */
   useEffect(() => {
@@ -136,8 +153,13 @@ function App() {
             onChange={(e) => onInputRoomNameChange(e)}
           />
           <button onClick={submitRoomName}>Join Room</button>
+          <div>전체 룸 목록</div>
         </>
       )}
+      {!isEnterRoom &&
+        publicRoomList.map((room) => {
+          return <div>{room}</div>;
+        })}
     </div>
   );
 }

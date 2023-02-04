@@ -11,6 +11,22 @@ const io = new Server(httpServer, {
   },
 });
 
+/** socket adapter로 부터 sids와 rooms를 가져와서 public room을 구한다.  */
+const getPublicRoom = () => {
+  const {
+    sockets: {
+      adapter: { sids, rooms },
+    },
+  } = io;
+  const publicRoom = [];
+  rooms.forEach((_, key) => {
+    if (sids.get(key) === undefined) {
+      publicRoom.push(key);
+    }
+  });
+  return publicRoom;
+};
+
 io.on('connection', (socket) => {
   //처음 들어온 사람은 익명의 닉네임 지정
   socket['nickname'] = 'Anon';
@@ -20,6 +36,9 @@ io.on('connection', (socket) => {
   });
   console.log(`User Connected , socket ID: ${socket.id}`); //user socket id
 
+  //public 룸이 변경되 것을 모두에게 전달
+  io.sockets.emit('room-change', getPublicRoom());
+
   //join : 지정된 룸에 소켓을 구독하도록 호출
   socket.on('join-room', (roomName) => {
     socket.join(roomName); //룸 입장
@@ -27,6 +46,9 @@ io.on('connection', (socket) => {
 
     //누군가 방에 들어오면 방 안에 있는 모두에게 메세지 보냄
     socket.to(roomName).emit('welcome', socket.nickname);
+
+    //public 룸이 변경되 것을 모두에게 전달
+    io.sockets.emit('room-change', getPublicRoom());
   });
 
   //클라이언트가 서버와 연결이 끊어지기 전에 마지막 메세지 전송
@@ -34,6 +56,12 @@ io.on('connection', (socket) => {
     socket.rooms.forEach((room) =>
       socket.to(room).emit('bye', socket.nickname)
     );
+  });
+
+  //클라이언트가 서버와 연결이 끊겼을때 메세지 보냄
+  socket.on('disconnect', () => {
+    //public 룸이 변경되 것을 모두에게 전달
+    io.sockets.emit('room-change', getPublicRoom());
   });
 
   //모든 룸 유저에게 채팅 메세지 보내기
