@@ -11,7 +11,7 @@ const io = new Server(httpServer, {
   },
 });
 
-/** socket adapter로 부터 sids와 rooms를 가져와서 public room을 구한다.  */
+/** socket adapter로 부터 sids와 rooms를 가져와서 public room에 대한 정보를 구한다.  */
 const getPublicRoom = () => {
   const {
     sockets: {
@@ -21,7 +21,10 @@ const getPublicRoom = () => {
   const publicRoom = [];
   rooms.forEach((_, key) => {
     if (sids.get(key) === undefined) {
-      publicRoom.push(key);
+      publicRoom.push({
+        roomName: key,
+        roomCount: io.sockets.adapter.rooms.get(key)?.size,
+      });
     }
   });
   return publicRoom;

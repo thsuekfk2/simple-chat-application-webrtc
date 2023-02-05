@@ -3,6 +3,10 @@ import { io } from 'socket.io-client';
 
 const socket = io(`http://localhost:3000`);
 
+type RoomList = {
+  roomName: String;
+  roomCount: Number;
+};
 function App() {
   interface MessageInterface {
     message: string;
@@ -16,7 +20,7 @@ function App() {
   const [roomName, setRoomName] = useState('');
   const [chatArray, setChatArray] = useState<MessageInterface[]>([]);
 
-  const [publicRoomList, setPublicRoomList] = useState([]);
+  const [publicRoomList, setPublicRoomList] = useState<RoomList[]>([]);
 
   /** 닉네임 onChange 핸들러 */
   const onNicknameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -158,7 +162,7 @@ function App() {
       )}
       {!isEnterRoom &&
         publicRoomList.map((room) => {
-          return <div>{room}</div>;
+          return <div>{`${room?.roomName}(${room?.roomCount})`}</div>;
         })}
     </div>
   );
