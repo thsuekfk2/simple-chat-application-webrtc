@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
+import { BounceIcon } from '../atoms/BounceIcon';
+import { Button } from '../atoms/Button';
 
 const socket = io(`http://localhost:3000`);
 
@@ -131,39 +133,43 @@ export const Home = () => {
   }, []);
 
   return (
-    <div className="App">
-      {isEnterRoom ? (
-        <>
-          <input
-            value={inputNewMessage || ''}
-            onChange={(e) => onMessageChange(e)}
-            onKeyDown={onKeyPress}
-          />
-          <button onClick={submitMessage}>Send Message</button>
-          <div>Room Name : {roomName}</div>
-          {chatArray.map((msg, i) => {
-            return <div key={i}>{msg.message}</div>;
+    <div className="h-screen w-screen">
+      <div className="bg-subColor fix h-full w-4/5 transition-all md:w-3/5 lg:w-2/5">
+        <BounceIcon icon={'☺'} />
+        {isEnterRoom ? (
+          <>
+            <input
+              value={inputNewMessage || ''}
+              onChange={(e) => onMessageChange(e)}
+              onKeyDown={onKeyPress}
+            />
+            <Button label="Send Message" onClick={() => submitMessage} />
+            <div>Room Name : {roomName}</div>
+            {chatArray.map((msg, i) => {
+              return <div key={i}>{msg.message}</div>;
+            })}
+          </>
+        ) : (
+          <>
+            <div className="text-xl">채팅 생성 하기</div>
+            <input
+              value={inputNickname || ''}
+              onChange={(e) => onNicknameChange(e)}
+            />
+            <Button label="Save Name" onClick={submitNickname} />
+            <input
+              value={inputRoomName}
+              onChange={(e) => onInputRoomNameChange(e)}
+            />
+            <Button label="Join Room" onClick={() => submitRoomName()} />
+            <div className="text-xl">룸 목록</div>
+          </>
+        )}
+        {!isEnterRoom &&
+          publicRoomList.map((room) => {
+            return <div>{`${room?.roomName}(${room?.roomCount})`}</div>;
           })}
-        </>
-      ) : (
-        <>
-          <input
-            value={inputNickname || ''}
-            onChange={(e) => onNicknameChange(e)}
-          />
-          <button onClick={submitNickname}>Save name</button>
-          <input
-            value={inputRoomName}
-            onChange={(e) => onInputRoomNameChange(e)}
-          />
-          <button onClick={submitRoomName}>Join Room</button>
-          <div className="text-3xl">전체 룸 목록</div>
-        </>
-      )}
-      {!isEnterRoom &&
-        publicRoomList.map((room) => {
-          return <div>{`${room?.roomName}(${room?.roomCount})`}</div>;
-        })}
+      </div>
     </div>
   );
 };
