@@ -6,8 +6,7 @@ interface Props {
 
 export const BounceIcon = ({ icon }: Props) => {
   return (
-    <div className="relative left-[97%] top-1/2 w-[50px] animate-bounce text-5xl">
-      {icon}
-    </div>
+    // absolute left-[97%] top-1/2 w-[50px] animate-bounce text-5xl
+    <div className="absolute  animate-bounce ">{icon}</div>
   );
 };

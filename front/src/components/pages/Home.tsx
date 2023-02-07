@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import { BounceIcon } from '../atoms/BounceIcon';
 import { Button } from '../atoms/Button';
+import { InputButton } from '../molecules/InputButton';
 
 const socket = io(`http://localhost:3000`);
 
@@ -133,9 +134,11 @@ export const Home = () => {
   }, []);
 
   return (
-    <div className="h-screen w-screen">
-      <div className="bg-subColor fix h-full w-4/5 transition-all md:w-3/5 lg:w-2/5">
-        <BounceIcon icon={'☺'} />
+    <div className="h-screen w-screen ">
+      <div className="bg-subColor fix absolute h-full w-4/5 min-w-[330px] transition-all md:w-3/5 lg:w-2/5">
+        <div className="absolute left-[97%] top-[48%] text-2xl sm:text-5xl">
+          <BounceIcon icon={'☺'} />
+        </div>
         {isEnterRoom ? (
           <>
             <input
@@ -150,20 +153,23 @@ export const Home = () => {
             })}
           </>
         ) : (
-          <>
-            <div className="text-xl">채팅 생성 하기</div>
-            <input
+          <div className=" absolute flex h-full w-full flex-col items-center justify-center gap-4">
+            <div className="text-xl">Welcome 👋</div>
+            <InputButton
+              placeholder="your name"
               value={inputNickname || ''}
-              onChange={(e) => onNicknameChange(e)}
+              onChange={(e: any) => onNicknameChange(e)}
+              submit={submitNickname}
+              label={'Save'}
             />
-            <Button label="Save Name" onClick={submitNickname} />
-            <input
+            <InputButton
+              placeholder="Room name"
               value={inputRoomName}
               onChange={(e) => onInputRoomNameChange(e)}
+              submit={submitRoomName}
+              label={'Enter'}
             />
-            <Button label="Join Room" onClick={() => submitRoomName()} />
-            <div className="text-xl">룸 목록</div>
-          </>
+          </div>
         )}
         {!isEnterRoom &&
           publicRoomList.map((room) => {
