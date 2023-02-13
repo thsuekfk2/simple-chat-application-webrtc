@@ -5,5 +5,5 @@ interface Props {
 }
 
 export const BounceIcon = ({ icon }: Props) => {
-  return <div className="absolute  animate-bounce ">{icon}</div>;
+  return <div className="absolute hover:animate-bounce z-[2]">{icon}</div>;
 };
