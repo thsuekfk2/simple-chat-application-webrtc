@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { InputButton } from '../molecules/InputButton';
 import { generateSocket, roomSocket } from '../../adapters/roomSocket';
-import { SOCKET_ENUM } from '../../adapters/event.enum';
+import { SOCKET_EVENT } from '../../adapters/event.enum';
 import { useNavigate } from 'react-router-dom';
 
 export const EnterForm = () => {
@@ -23,7 +23,7 @@ export const EnterForm = () => {
 
   /** 닉네임 전송 및 저장 */
   const submitNickname = () => {
-    roomSocket?.emit(SOCKET_ENUM.SAVE_NICKNAME, inputNickname);
+    roomSocket?.emit(SOCKET_EVENT.SAVE_NICKNAME, inputNickname);
   };
 
   /** 룸 이름 onChange 핸들러 */
@@ -40,16 +40,16 @@ export const EnterForm = () => {
     if (inputNickname === '') {
       setNickname('me');
     }
-    roomSocket?.emit(SOCKET_ENUM.JOIN_ROOM, inputRoomName);
+    roomSocket?.emit(SOCKET_EVENT.JOIN_ROOM, inputRoomName);
     // setRoomName(inputRoomName); //룸 이름 저장
     setInputRoomName('');
     // 룸 페이지 진입
-    navigate('/room');
+    navigate('/room', { replace: true });
   };
 
   return (
-    <div className=" absolute flex h-full w-full flex-col items-center justify-center gap-4">
-      <div className="text-xl">Welcome 👋</div>
+    <div className=" absolute flex h-full flex-col items-center justify-center gap-4">
+      <div className="text-xl font-bold">Welcome 👋</div>
       <InputButton
         placeholder="your name"
         value={inputNickname || ''}
