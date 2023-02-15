@@ -44,11 +44,11 @@ export const EnterForm = () => {
     // setRoomName(inputRoomName); //룸 이름 저장
     setInputRoomName('');
     // 룸 페이지 진입
-    navigate('/room', { replace: true });
+    navigate(`/room?roomName=${inputRoomName}`);
   };
 
   return (
-    <div className=" absolute flex h-full flex-col items-center justify-center gap-4">
+    <div className=" absolute flex h-full flex-col items-center justify-center gap-4 w-[300px]">
       <div className="text-xl font-bold">Welcome 👋</div>
       <InputButton
         placeholder="your name"
