@@ -1,20 +1,18 @@
 import { useNavigate } from 'react-router-dom';
 import { joinRoom } from '../../adapters/roomSocket';
+import roomListInterface from '../../interface/room.interface';
 import Avatar from './AvatarImg';
 
-interface Props {
-  room?: {
-    roomName: string;
-    roomCount: number;
-  };
+interface RoomTypeProps {
+  room?: roomListInterface;
 }
 
-export const OpenRoomItem = ({ room }: Props) => {
+export const OpenRoomItem = ({ room }: RoomTypeProps) => {
   const navigate = useNavigate();
 
   const enterRoom = (roomName?: string) => {
     joinRoom(roomName);
-    navigate('/room', { replace: true });
+    navigate(`/room?roomName=${roomName}`);
   };
 
   return (

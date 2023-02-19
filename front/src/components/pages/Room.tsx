@@ -2,21 +2,14 @@ import React, { useEffect, useState } from 'react';
 import Avatar from '../atoms/AvatarImg';
 import { roomSocket } from '../../adapters/roomSocket';
 import { InputButton } from '../molecules/InputButton';
-
-type RoomList = {
-  roomName: String;
-  roomCount: Number;
-};
+import messageInterface from '../../interface/message.interface';
+import roomListInterface from '../../interface/room.interface';
 
 export const Room = () => {
-  interface MessageInterface {
-    message: string;
-  }
-
   const [inputNewMessage, setInputNewMessage] = useState('');
   const [isEnterRoom, setEnterRoom] = useState(false);
-  const [chatArray, setChatArray] = useState<MessageInterface[]>([]);
-  const [publicRoomList, setPublicRoomList] = useState<RoomList[]>([]);
+  const [chatArray, setChatArray] = useState<messageInterface[]>([]);
+  const [publicRoomList, setPublicRoomList] = useState<roomListInterface[]>([]);
 
   /** 채팅 onChange 핸들러 */
   const onMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,9 +24,9 @@ export const Room = () => {
     event?.preventDefault();
     roomSocket?.emit('chat-message', inputNewMessage, 'test', () => {
       //마지막 함수는 소켓이 완료되면 호출
-      setChatArray((prev: MessageInterface[]) => [
+      setChatArray((prev: messageInterface[]) => [
         ...prev,
-        { message: `${'Dd'} : ` + inputNewMessage },
+        { message: `${'Dd'} : ` + inputNewMessage, type: '' },
       ]);
       setInputNewMessage('');
     });
@@ -52,7 +45,7 @@ export const Room = () => {
   /** 채팅 소켓 메세지 */
   useEffect(() => {
     roomSocket?.on('chat-message', (msg: string, user: string) => {
-      setChatArray((prev: MessageInterface[]) => [
+      setChatArray((prev: messageInterface[]) => [
         ...prev,
         { message: `${user} : ` + msg, type: '' },
       ]);
@@ -66,14 +59,14 @@ export const Room = () => {
   useEffect(() => {
     roomSocket?.on('welcome', (user: string) => {
       console.log('someone join in!');
-      setChatArray((prev: MessageInterface[]) => [
+      setChatArray((prev: messageInterface[]) => [
         ...prev,
         { message: `${user} joined!`, type: 'notice' },
       ]);
     });
     roomSocket?.on('bye', (user: string) => {
       console.log('someone lefted !');
-      setChatArray((prev: MessageInterface[]) => [
+      setChatArray((prev: messageInterface[]) => [
         ...prev,
         { message: `${user} lefted!`, type: 'notice' },
       ]);
@@ -97,7 +90,7 @@ export const Room = () => {
         <div className="text-xs flex flex-col flex-2 bg-subColor w-full md:w-[300px] min-w-[300px] h-[500px] align-middle items-center justify-between">
           {/* 채팅창 */}
           <div>
-            {chatArray.map((data: any, i) => {
+            {chatArray.map((data, i) => {
               if (data.type === 'notice')
                 return (
                   <div
@@ -114,7 +107,7 @@ export const Room = () => {
           <div className="w-full">
             <InputButton
               value={inputNewMessage || ''}
-              onChange={(e: any) => onMessageChange(e)}
+              onChange={(e) => onMessageChange(e)}
               onKeyDown={onKeyPress}
               label={'Save'}
               submit={submitMessage}

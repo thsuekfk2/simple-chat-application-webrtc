@@ -53,7 +53,7 @@ export const EnterForm = () => {
       <InputButton
         placeholder="your name"
         value={inputNickname || ''}
-        onChange={(e: any) => onNicknameChange(e)}
+        onChange={(e) => onNicknameChange(e)}
         submit={submitNickname}
         label={'Save'}
       />
