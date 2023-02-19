@@ -51,18 +51,18 @@ export const EnterForm = () => {
     <div className=" absolute flex h-full flex-col items-center justify-center gap-4 w-[300px]">
       <div className="text-xl font-bold">Welcome 👋</div>
       <InputButton
-        placeholder="your name"
+        inputLabel="your name"
         value={inputNickname || ''}
         onChange={(e) => onNicknameChange(e)}
         submit={submitNickname}
-        label={'Save'}
+        buttonLabel={'Save'}
       />
       <InputButton
-        placeholder="Room name"
+        inputLabel="Room name"
         value={inputRoomName}
         onChange={(e) => onInputRoomNameChange(e)}
         submit={submitRoomName}
-        label={'Enter'}
+        buttonLabel={'Enter'}
       />
     </div>
   );
