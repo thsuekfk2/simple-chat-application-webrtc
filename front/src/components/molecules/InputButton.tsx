@@ -16,14 +16,11 @@ export const InputButton = ({
 }: Props) => {
   return (
     <div className="relative w-full">
-      <div>
-        {inputLabel ? (
-          <LabelInput label={inputLabel} {...rest} />
-        ) : (
-          <Input {...rest} />
-        )}
-      </div>
-
+      {inputLabel ? (
+        <LabelInput label={inputLabel} {...rest} />
+      ) : (
+        <Input {...rest} />
+      )}
       <div className=" absolute bottom-[5px] right-1">
         <Button label={buttonLabel} onClick={submit} />
       </div>
