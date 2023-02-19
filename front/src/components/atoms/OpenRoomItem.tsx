@@ -3,14 +3,14 @@ import { joinRoom } from '../../adapters/roomSocket';
 import roomListInterface from '../../interface/room.interface';
 import Avatar from './AvatarImg';
 
-interface RoomTypeProps {
+interface Props {
   room?: roomListInterface;
 }
 
-export const OpenRoomItem = ({ room }: RoomTypeProps) => {
+export const OpenRoomItem = ({ room }: Props) => {
   const navigate = useNavigate();
 
-  const enterRoom = (roomName?: string) => {
+  const enterRoom = (roomName?: string | null) => {
     joinRoom(roomName);
     navigate(`/room?roomName=${roomName}`);
   };

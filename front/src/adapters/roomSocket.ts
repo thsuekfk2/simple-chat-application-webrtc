@@ -13,7 +13,7 @@ const generateSocket = () => {
   console.log('소켓 연결 완료😀 : ', roomSocket);
 };
 
-const joinRoom = (roomName?: string) => {
+const joinRoom = (roomName?: string | null) => {
   roomSocket?.emit(SOCKET_EVENT.JOIN_ROOM, roomName);
 };
 
