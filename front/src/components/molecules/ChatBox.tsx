@@ -20,9 +20,11 @@ export const ChatBox = ({ chatArray }: Props) => {
   return (
     <div className="flex flex-col w-[100%] overflow-auto">
       {chatArray.map((data, i) => {
-        if (data.type === 'notice') return <NoticeChatBox chatData={data} />;
-        if (data.type === 'me') return <MyChatBox chatData={data} />;
-        if (data.type === 'user') return <YourChatBox chatData={data} />;
+        if (data.type === 'notice')
+          return <NoticeChatBox chatData={data} key={i} />;
+        if (data.type === 'me') return <MyChatBox chatData={data} key={i} />;
+        if (data.type === 'user')
+          return <YourChatBox chatData={data} key={i} />;
       })}
       <div ref={divRef} />
     </div>
