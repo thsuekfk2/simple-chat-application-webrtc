@@ -14,7 +14,7 @@ export const MyChatBox = ({ chatData }: Props) => {
       <div className="chat-header">
         <time className="text-xs opacity-50 ml-3">12:46</time>
       </div>
-      <div className="chat-bubble break-words bg-subColor text-[#000]">
+      <div className="chat-bubble break-words bg-subColor text-[#000] pt-3.5">
         {chatData.message}
       </div>
     </div>

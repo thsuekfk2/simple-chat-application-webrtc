@@ -2,7 +2,7 @@ import React from 'react';
 
 export const SoundIcon = () => {
   return (
-    <label className="swap">
+    <label className="swap mr-5">
       <input type="checkbox" />
       <svg
         className="swap-on fill-current"
