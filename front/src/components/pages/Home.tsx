@@ -4,9 +4,11 @@ import { EnterForm } from '../organisms/EnterForm';
 import { roomSocket } from '../../adapters/roomSocket';
 import { RoomList } from '../organisms/RoomList';
 import roomListInterface from '../../interface/room.interface';
+import { useCreateMediaStream } from '../../hooks/useCreateMediaStream';
 
 export const Home = () => {
   const [publicRoomList, setPublicRoomList] = useState<roomListInterface[]>([]);
+  const { createStream } = useCreateMediaStream();
 
   /** 전체 public 룸 조회 소켓 메세지 */
   useEffect(() => {
@@ -16,6 +18,10 @@ export const Home = () => {
     return () => {
       roomSocket?.off('room-change');
     };
+  }, []);
+
+  useEffect(() => {
+    createStream();
   }, []);
 
   return (

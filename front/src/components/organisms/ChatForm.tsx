@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { useRecoilState } from 'recoil';
 import { roomSocket } from '../../adapters/roomSocket';
 import messageInterface from '../../interface/message.interface';
+import peerConnectState from '../../store/peerConnectState';
 import { ChatBox } from '../molecules/ChatBox';
 import { InputButton } from '../molecules/InputButton';
 
@@ -9,8 +11,9 @@ interface Props {
 }
 export const ChatForm = ({ roomName }: Props) => {
   const [chatArray, setChatArray] = useState<messageInterface[]>([]);
-
   const [inputNewMessage, setInputNewMessage] = useState('');
+  const [peerConnectionState, setPeerConnectionState] =
+    useRecoilState(peerConnectState);
 
   /** 채팅 onChange 핸들러 */
   const onMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,18 +61,25 @@ export const ChatForm = ({ roomName }: Props) => {
 
   /** 룸 입장 및 끊김 소켓 메세지 */
   useEffect(() => {
-    roomSocket?.on('welcome', (user: string) => {
-      console.log('someone join in!');
-      setChatArray((prev: messageInterface[]) => [
-        ...prev,
-        { message: `${user} joined!`, type: 'notice' },
-      ]);
-    });
-    roomSocket?.on('bye', (user: string) => {
+    roomSocket?.on(
+      'welcome',
+      (message: { nickname: string; socketId: string }) => {
+        console.log('someone join socketId:', message.socketId);
+        setChatArray((prev: messageInterface[]) => [
+          ...prev,
+          { message: `${message.nickname} joined!`, type: 'notice' },
+        ]);
+        setPeerConnectionState({
+          ...peerConnectionState,
+          socketId: message.socketId,
+        });
+      }
+    );
+    roomSocket?.on('bye', (message: { nickname: string; socketId: string }) => {
       console.log('someone lefted !');
       setChatArray((prev: messageInterface[]) => [
         ...prev,
-        { message: `${user} lefted!`, type: 'notice' },
+        { message: `${message.nickname} lefted!`, type: 'notice' },
       ]);
     });
     return () => {
@@ -79,7 +89,7 @@ export const ChatForm = ({ roomName }: Props) => {
   }, []);
 
   return (
-    <div className="text-xs flex flex-col flex-2 bg-[#fff] w-full md:w-[300px] min-w-[300px] h-[500px] align-middle items-center justify-between ">
+    <div className="text-xs flex flex-col flex-2 bg-[#fff] w-full md:w-[300px] min-w-[300px] min-h-[300px] align-middle items-center justify-between ">
       {/* 채팅창 */}
       <ChatBox chatArray={chatArray} />
       {/* 채팅 입력 */}
