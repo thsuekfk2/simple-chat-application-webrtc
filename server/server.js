@@ -48,8 +48,9 @@ io.on('connection', (socket) => {
     console.log(socket.rooms); //모든 room id 정보 조회
 
     //누군가 방에 들어오면 방 안에 있는 모두에게 메세지 보냄
-    socket.to(roomName).emit('welcome', socket.nickname);
-
+    socket
+      .to(roomName)
+      .emit('welcome', { nickname: socket.nickname, socketId: socket.id });
     //public 룸이 변경되 것을 모두에게 전달
     io.sockets.emit('room-change', getPublicRoom());
   });
@@ -57,7 +58,9 @@ io.on('connection', (socket) => {
   //클라이언트가 서버와 연결이 끊어지기 전에 마지막 메세지 전송
   socket.on('disconnecting', () => {
     socket.rooms.forEach((room) =>
-      socket.to(room).emit('bye', socket.nickname)
+      socket
+        .to(room)
+        .emit('bye', { nickname: socket.nickname, socketId: socket.id })
     );
   });
 
@@ -76,6 +79,21 @@ io.on('connection', (socket) => {
   //룸 유저의 닉네임 저장
   socket.on('nick-name', (name) => {
     socket['nickname'] = name;
+  });
+
+  //offer을 받으면 offer 전송
+  socket.on('offer', (offer, roomName) => {
+    socket.to(roomName).emit('offer', offer);
+  });
+
+  //answer을 받으면 answer 전송
+  socket.on('answer', (answer, roomName) => {
+    socket.to(roomName).emit('answer', answer);
+  });
+
+  //icecandidate 받으면 icecandidate 전송
+  socket.on('ice', (ice, roomName) => {
+    socket.to(roomName).emit('ice', ice);
   });
 });
 
