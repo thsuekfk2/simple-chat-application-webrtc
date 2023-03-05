@@ -9,7 +9,7 @@ export const EnterForm = () => {
 
   const [inputRoomName, setInputRoomName] = useState('');
   const [inputNickname, setNickname] = useState('');
-  // const [roomName, setRoomName] = useState('');
+  const [isSaveName, setSaveName] = useState(false);
 
   useEffect(() => {
     generateSocket();
@@ -24,6 +24,7 @@ export const EnterForm = () => {
   /** 닉네임 전송 및 저장 */
   const submitNickname = () => {
     roomSocket?.emit(SOCKET_EVENT.SAVE_NICKNAME, inputNickname);
+    setSaveName(true);
   };
 
   /** 룸 이름 onChange 핸들러 */
@@ -49,21 +50,39 @@ export const EnterForm = () => {
 
   return (
     <div className=" absolute flex h-full flex-col items-center justify-center gap-4 w-[300px]">
-      <div className="text-xl font-bold">Welcome 👋</div>
-      <InputButton
-        inputLabel="your name"
-        value={inputNickname || ''}
-        onChange={(e) => onNicknameChange(e)}
-        submit={submitNickname}
-        buttonLabel={'Save'}
-      />
-      <InputButton
-        inputLabel="Room name"
-        value={inputRoomName}
-        onChange={(e) => onInputRoomNameChange(e)}
-        submit={submitRoomName}
-        buttonLabel={'Enter'}
-      />
+      <div className="text-xl font-bold pb-5">
+        {isSaveName
+          ? `Hello ${inputNickname ? inputNickname : 'Anon'}님 👋`
+          : 'What your name ? 🤔'}
+      </div>
+      {isSaveName ? (
+        <>
+          <button
+            className="absolute right-5 cursor-pointer text-xs hover:text-hoverColor"
+            onClick={() => {
+              setSaveName(false);
+              setNickname('');
+            }}
+          >
+            Edit name
+          </button>
+          <InputButton
+            inputLabel="Room name"
+            value={inputRoomName}
+            onChange={(e) => onInputRoomNameChange(e)}
+            submit={submitRoomName}
+            buttonLabel={'Enter'}
+          />
+        </>
+      ) : (
+        <InputButton
+          inputLabel="your name"
+          value={inputNickname || ''}
+          onChange={(e) => onNicknameChange(e)}
+          submit={submitNickname}
+          buttonLabel={'Save'}
+        />
+      )}
     </div>
   );
 };

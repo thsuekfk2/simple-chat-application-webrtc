@@ -6,7 +6,7 @@ import peerConnectState from '../store/peerConnectState';
 
 export const usePeerConnection = (roomName: string | null) => {
   const { myMediaStream } = useRecoilValue(mediaStreamState);
-  const { myPeerConnection } = useRecoilValue(peerConnectState);
+  const { myPeerConnection, myPeerStream } = useRecoilValue(peerConnectState);
   const [peerConnectionState, setPeerConnectionState] =
     useRecoilState(peerConnectState);
 
@@ -136,9 +136,10 @@ export const usePeerConnection = (roomName: string | null) => {
     roomSocket?.on('ice', onIceCandidateReceived);
 
     return () => {
+      roomSocket?.off('welcome');
       roomSocket?.off('offer');
       roomSocket?.off('answer');
       roomSocket?.off('ice');
     };
-  }, [myMediaStream, myPeerConnection, roomName]);
+  }, [myMediaStream, myPeerConnection, myPeerStream, roomName]);
 };

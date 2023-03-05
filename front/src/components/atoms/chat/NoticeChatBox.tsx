@@ -7,8 +7,10 @@ interface Props {
 
 export const NoticeChatBox = ({ chatData }: Props) => {
   return (
-    <div className="chat chat-start " key={chatData.message}>
-      <div className="chat-bubble break-words">{chatData.message}</div>
+    <div className="chat flex justify-center" key={chatData.message}>
+      <div className="chat-bubble break-words pt-[14px]">
+        {chatData.message}
+      </div>
     </div>
   );
 };
