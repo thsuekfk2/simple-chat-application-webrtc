@@ -81,6 +81,10 @@ export const ChatForm = ({ roomName }: Props) => {
         ...prev,
         { message: `${message.nickname} lefted!`, type: 'notice' },
       ]);
+      setPeerConnectionState({
+        ...peerConnectionState,
+        myPeerStream: null,
+      });
     });
     return () => {
       roomSocket?.off('welcome');

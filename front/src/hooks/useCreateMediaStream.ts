@@ -1,12 +1,14 @@
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import mediaStreamState from '../store/mediaStreamState';
 
 export const useCreateMediaStream = () => {
+  const { myMediaStream } = useRecoilValue(mediaStreamState);
   const [myStream, setMyStream] = useRecoilState(mediaStreamState);
   const initialConstraints = {
     audio: true,
     video: true,
   };
+
   const createStream = async () => {
     try {
       const videoStream = await navigator.mediaDevices.getUserMedia(
@@ -21,7 +23,40 @@ export const useCreateMediaStream = () => {
     }
   };
 
+  /** 오디오 토글 */
+  const toggleAudioStream = () => {
+    if (myMediaStream?.id) {
+      myMediaStream
+        .getAudioTracks()
+        .forEach((track) => (track.enabled = !track.enabled));
+    } else {
+      console.log('myStream doesnt exist', myStream);
+    }
+  };
+
+  /** 비디오 토글 */
+  const toggleVideoStream = () => {
+    if (myMediaStream?.id) {
+      myMediaStream
+        .getVideoTracks()
+        .forEach((track) => (track.enabled = !track.enabled));
+    } else {
+      console.log('myStream doesnt exist', myStream);
+    }
+  };
+
+  const stopStream = () => {
+    if (myMediaStream?.id) {
+      myMediaStream.getTracks().forEach((track) => track.stop());
+    } else {
+      console.log('myStream doesnt exist', myStream);
+    }
+  };
+
   return {
     createStream,
+    stopStream,
+    toggleVideoStream,
+    toggleAudioStream,
   };
 };

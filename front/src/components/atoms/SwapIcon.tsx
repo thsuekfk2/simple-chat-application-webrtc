@@ -2,14 +2,27 @@ import React from 'react';
 interface Props {
   on: string;
   off: string;
+  toggleClick?: () => void;
+  swapOnClick?: () => void;
+  swapOffClick?: () => void;
 }
 
-export const SwapIcon = ({ on, off }: Props) => {
+export const SwapIcon = ({
+  on,
+  off,
+  toggleClick,
+  swapOnClick,
+  swapOffClick,
+}: Props) => {
   return (
     <label className="swap swap-flip text-2xl mr-5">
-      <input type="checkbox" />
-      <div className="swap-on">{on}</div>
-      <div className="swap-off">{off}</div>
+      <input type="checkbox" onClick={toggleClick} />
+      <div className="swap-off" onClick={swapOnClick}>
+        {on}
+      </div>
+      <div className="swap-on" onClick={swapOffClick}>
+        {off}
+      </div>
     </label>
   );
 };
