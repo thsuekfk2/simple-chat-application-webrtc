@@ -1,11 +1,12 @@
 import { SOCKET_EVENT } from './event.enum';
 import { io, Socket } from 'socket.io-client';
+const VITE_APP_API_SERVER = import.meta.env.VITE_APP_API_SERVER;
 
 let roomSocket = null as Socket | null;
 
 const generateSocket = () => {
   if (!roomSocket) {
-    roomSocket = io(`http://localhost:3000`, {
+    roomSocket = io(VITE_APP_API_SERVER, {
       transports: ['websocket', 'polling'],
     });
   } else return;
