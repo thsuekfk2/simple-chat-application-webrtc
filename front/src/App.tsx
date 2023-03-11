@@ -3,6 +3,7 @@ import { Home } from './components/pages/Home';
 import { Room } from './components/pages/Room';
 
 import { RecoilRoot } from 'recoil';
+import { Setting } from './components/pages/Setting';
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/room" element={<Room />} />
+          <Route path="/setting" element={<Setting />} />
         </Routes>
       </Router>
     </RecoilRoot>

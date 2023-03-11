@@ -8,7 +8,6 @@ import { useCreateMediaStream } from '../../hooks/useCreateMediaStream';
 
 export const Home = () => {
   const [publicRoomList, setPublicRoomList] = useState<roomListInterface[]>([]);
-  const { createStream } = useCreateMediaStream();
 
   /** 전체 public 룸 조회 소켓 메세지 */
   useEffect(() => {
@@ -20,13 +19,9 @@ export const Home = () => {
     };
   }, []);
 
-  useEffect(() => {
-    createStream();
-  }, []);
-
   return (
     <div className="flex h-screen w-screen flex-row overflow-y-hidden">
-      <div className="bg-subColor flex h-full w-2/5 min-w-[335px] justify-center">
+      <div className="bg-subColor flex h-full w-[50%] min-w-[335px] justify-center">
         <EnterForm />
       </div>
       <div className="relative right-5 bottom-[100px] flex items-center text-2xl sm:text-5xl hover:text-[#4f4f4fee] cursor-pointer">

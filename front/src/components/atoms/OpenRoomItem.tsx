@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom';
-import { joinRoom } from '../../adapters/roomSocket';
 import roomListInterface from '../../interface/room.interface';
 import Avatar from './AvatarImg';
 
@@ -11,8 +10,12 @@ export const OpenRoomItem = ({ room }: Props) => {
   const navigate = useNavigate();
 
   const enterRoom = (roomName?: string | null) => {
-    joinRoom(roomName);
-    navigate(`/room?roomName=${roomName}`);
+    //디바이스 세팅 페이지 진입
+    navigate(`/setting`, {
+      state: {
+        roomName: roomName,
+      },
+    });
   };
 
   return (

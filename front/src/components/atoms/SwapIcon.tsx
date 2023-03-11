@@ -1,7 +1,7 @@
 import React from 'react';
 interface Props {
-  on: string;
-  off: string;
+  on: JSX.Element | string;
+  off: JSX.Element | string;
   toggleClick?: () => void;
   swapOnClick?: () => void;
   swapOffClick?: () => void;
@@ -15,7 +15,7 @@ export const SwapIcon = ({
   swapOffClick,
 }: Props) => {
   return (
-    <label className="swap swap-flip text-2xl mr-5">
+    <label className="swap swap-flip text-2xl mr-5 ">
       <input type="checkbox" onClick={toggleClick} />
       <div className="swap-off" onClick={swapOnClick}>
         {on}

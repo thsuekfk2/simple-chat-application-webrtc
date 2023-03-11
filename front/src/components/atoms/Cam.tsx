@@ -13,7 +13,7 @@ export const Cam = ({ videoRef, participants, ...rest }: Props) => {
       autoPlay
       playsInline
       {...rest}
-      className={participants != 1 ? 'w-[50%]' : 'w-full'}
+      className={participants != 1 ? 'w-[50%]' : 'max-w-[90%]'}
     />
   );
 };
