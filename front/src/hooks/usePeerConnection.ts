@@ -1,10 +1,11 @@
+import { SOCKET_EVENT } from './../adapters/event.enum';
 import { useRecoilValue, useRecoilState } from 'recoil';
 import { useEffect } from 'react';
 import { roomSocket } from '../adapters/roomSocket';
 import mediaStreamState from '../store/mediaStreamState';
 import peerConnectState from '../store/peerConnectState';
 
-export const usePeerConnection = (roomName: string | null) => {
+export const usePeerConnection = (roomName?: string | null) => {
   const { myMediaStream } = useRecoilValue(mediaStreamState);
   const { myPeerConnection, myPeerStream } = useRecoilValue(peerConnectState);
   const [peerConnectionState, setPeerConnectionState] =
@@ -130,16 +131,22 @@ export const usePeerConnection = (roomName: string | null) => {
       }
     };
 
-    roomSocket?.on('welcome', onNewUser);
+    roomSocket?.on(SOCKET_EVENT.WELCOME_USER, onNewUser);
     roomSocket?.on('offer', onOffer);
     roomSocket?.on('answer', onAnswer);
     roomSocket?.on('ice', onIceCandidateReceived);
 
     return () => {
-      roomSocket?.off('welcome');
+      roomSocket?.off(SOCKET_EVENT.WELCOME_USER);
       roomSocket?.off('offer');
       roomSocket?.off('answer');
       roomSocket?.off('ice');
     };
-  }, [myMediaStream, myPeerConnection, myPeerStream, roomName]);
+  }, [
+    myMediaStream,
+    myPeerConnection,
+    myPeerStream,
+    roomName,
+    peerConnectionState.socketId,
+  ]);
 };

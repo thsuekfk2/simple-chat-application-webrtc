@@ -5,6 +5,7 @@ interface PeerConnectionInterface {
   myPeerConnection?: RTCPeerConnection;
   socketId: string;
   myPeerStream: MediaStream | null;
+  nickname: string;
 }
 
 const { persistAtom } = recoilPersist({
@@ -16,6 +17,7 @@ const peerConnectState = atom<PeerConnectionInterface>({
   default: {
     socketId: '',
     myPeerStream: null,
+    nickname: '',
   },
   effects_UNSTABLE: [persistAtom],
 });

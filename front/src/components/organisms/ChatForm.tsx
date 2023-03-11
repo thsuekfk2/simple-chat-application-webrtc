@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
+import { SOCKET_EVENT } from '../../adapters/event.enum';
 import { roomSocket } from '../../adapters/roomSocket';
 import messageInterface from '../../interface/message.interface';
 import peerConnectState from '../../store/peerConnectState';
@@ -58,11 +59,10 @@ export const ChatForm = ({ roomName }: Props) => {
       roomSocket?.off('chat-message');
     };
   }, []);
-
   /** 룸 입장 및 끊김 소켓 메세지 */
   useEffect(() => {
     roomSocket?.on(
-      'welcome',
+      SOCKET_EVENT.WELCOME_USER,
       (message: { nickname: string; socketId: string }) => {
         console.log('someone join socketId:', message.socketId);
         setChatArray((prev: messageInterface[]) => [
@@ -72,6 +72,7 @@ export const ChatForm = ({ roomName }: Props) => {
         setPeerConnectionState({
           ...peerConnectionState,
           socketId: message.socketId,
+          nickname: message.nickname,
         });
       }
     );
@@ -87,7 +88,7 @@ export const ChatForm = ({ roomName }: Props) => {
       });
     });
     return () => {
-      roomSocket?.off('welcome');
+      roomSocket?.off(SOCKET_EVENT.WELCOME_USER);
       roomSocket?.off('bye');
     };
   }, []);
