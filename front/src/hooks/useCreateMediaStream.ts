@@ -14,7 +14,7 @@ export const useCreateMediaStream = () => {
       const videoStream = await navigator.mediaDevices.getUserMedia(
         initialConstraints
       );
-      setMyStream({ ...myStream, myMediaStream: videoStream });
+      setMyStream((prev) => ({ ...prev, myMediaStream: videoStream }));
       console.log('나의 비디오 stream', videoStream);
       return;
     } catch (error) {

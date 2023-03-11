@@ -41,10 +41,10 @@ export const usePeerConnection = (roomName?: string | null) => {
 
       RTCpeerConnection.ontrack = (event: RTCTrackEvent) => {
         console.log('got an event from my peer');
-        setPeerConnectionState({
-          ...peerConnectionState,
+        setPeerConnectionState((prev) => ({
+          ...prev,
           myPeerStream: event.streams[0],
-        });
+        }));
       };
 
       RTCpeerConnection.onicegatheringstatechange = (event: Event) => {
@@ -57,10 +57,11 @@ export const usePeerConnection = (roomName?: string | null) => {
           RTCpeerConnection.addTrack(track, myMediaStream);
         });
       }
-      setPeerConnectionState({
-        ...peerConnectionState,
+
+      setPeerConnectionState((prev) => ({
+        ...prev,
         myPeerConnection: RTCpeerConnection,
-      });
+      }));
 
       return RTCpeerConnection;
     };
@@ -131,7 +132,18 @@ export const usePeerConnection = (roomName?: string | null) => {
       }
     };
 
-    roomSocket?.on(SOCKET_EVENT.WELCOME_USER, onNewUser);
+    roomSocket?.on(
+      SOCKET_EVENT.WELCOME_USER,
+      (message: { nickname: string; socketId: string }) => {
+        onNewUser();
+        console.log('onNewUser');
+        setPeerConnectionState((prev) => ({
+          ...prev,
+          nickname: message.nickname,
+          socketId: message.socketId,
+        }));
+      }
+    );
     roomSocket?.on('offer', onOffer);
     roomSocket?.on('answer', onAnswer);
     roomSocket?.on('ice', onIceCandidateReceived);
@@ -147,6 +159,6 @@ export const usePeerConnection = (roomName?: string | null) => {
     myPeerConnection,
     myPeerStream,
     roomName,
-    peerConnectionState.socketId,
+    peerConnectionState,
   ]);
 };

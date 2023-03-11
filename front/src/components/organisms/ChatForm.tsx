@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { SOCKET_EVENT } from '../../adapters/event.enum';
 import { roomSocket } from '../../adapters/roomSocket';
 import messageInterface from '../../interface/message.interface';
@@ -13,8 +13,8 @@ interface Props {
 export const ChatForm = ({ roomName }: Props) => {
   const [chatArray, setChatArray] = useState<messageInterface[]>([]);
   const [inputNewMessage, setInputNewMessage] = useState('');
-  const [peerConnectionState, setPeerConnectionState] =
-    useRecoilState(peerConnectState);
+  const { socketId, nickname } = useRecoilValue(peerConnectState);
+  const [, setPeerConnectionState] = useRecoilState(peerConnectState);
 
   /** 채팅 onChange 핸들러 */
   const onMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,33 +59,29 @@ export const ChatForm = ({ roomName }: Props) => {
       roomSocket?.off('chat-message');
     };
   }, []);
-  /** 룸 입장 및 끊김 소켓 메세지 */
+
+  /** 유저가 들어왔을 경우 */
   useEffect(() => {
-    roomSocket?.on(
-      SOCKET_EVENT.WELCOME_USER,
-      (message: { nickname: string; socketId: string }) => {
-        console.log('someone join socketId:', message.socketId);
-        setChatArray((prev: messageInterface[]) => [
-          ...prev,
-          { message: `${message.nickname} joined!`, type: 'notice' },
-        ]);
-        setPeerConnectionState({
-          ...peerConnectionState,
-          socketId: message.socketId,
-          nickname: message.nickname,
-        });
-      }
-    );
+    if (socketId) {
+      setChatArray((prev: messageInterface[]) => [
+        ...prev,
+        { message: `${nickname} joined!`, type: 'notice' },
+      ]);
+    }
+  }, [socketId]);
+
+  /** 끊김 소켓 메세지 */
+  useEffect(() => {
     roomSocket?.on('bye', (message: { nickname: string; socketId: string }) => {
       console.log('someone lefted !');
       setChatArray((prev: messageInterface[]) => [
         ...prev,
         { message: `${message.nickname} lefted!`, type: 'notice' },
       ]);
-      setPeerConnectionState({
-        ...peerConnectionState,
+      setPeerConnectionState((prev) => ({
+        ...prev,
         myPeerStream: null,
-      });
+      }));
     });
     return () => {
       roomSocket?.off(SOCKET_EVENT.WELCOME_USER);
