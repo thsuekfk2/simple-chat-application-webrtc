@@ -2,10 +2,14 @@ import { atom } from 'recoil';
 import { recoilPersist } from 'recoil-persist';
 
 interface PeerConnectionInterface {
-  myPeerConnection?: RTCPeerConnection;
-  socketId: string;
-  myPeerStream: MediaStream | null;
-  nickname: string;
+  myPeerConnection: any;
+  // myPeerConnection: myPeerConnection[];
+  // myPeersSocketId: string[];
+  // myPeersStream: MediaStream[];
+  // myPeersNickname: string[];
+  myPeersSocketId: any;
+  myPeersStream: any;
+  myPeersNickname: any;
 }
 
 const { persistAtom } = recoilPersist({
@@ -15,9 +19,10 @@ const { persistAtom } = recoilPersist({
 const peerConnectState = atom<PeerConnectionInterface>({
   key: 'peerConnectState',
   default: {
-    socketId: '',
-    myPeerStream: null,
-    nickname: '',
+    myPeerConnection: [],
+    myPeersSocketId: [],
+    myPeersStream: [],
+    myPeersNickname: [],
   },
   effects_UNSTABLE: [persistAtom],
 });

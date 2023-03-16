@@ -13,7 +13,8 @@ interface Props {
 export const ChatForm = ({ roomName }: Props) => {
   const [chatArray, setChatArray] = useState<messageInterface[]>([]);
   const [inputNewMessage, setInputNewMessage] = useState('');
-  const { socketId, nickname } = useRecoilValue(peerConnectState);
+  const { myPeersSocketId, myPeersNickname, myPeersStream } =
+    useRecoilValue(peerConnectState);
   const [, setPeerConnectionState] = useRecoilState(peerConnectState);
 
   /** 채팅 onChange 핸들러 */
@@ -62,27 +63,33 @@ export const ChatForm = ({ roomName }: Props) => {
 
   /** 유저가 들어왔을 경우 */
   useEffect(() => {
-    if (socketId) {
+    if (myPeersSocketId.length > 0) {
       setChatArray((prev: messageInterface[]) => [
         ...prev,
-        { message: `${nickname} joined!`, type: 'notice' },
+        {
+          message: `${myPeersNickname[myPeersSocketId]} joined!`,
+          type: 'notice',
+        },
       ]);
     }
-  }, [socketId]);
+  }, [myPeersSocketId]);
 
   /** 끊김 소켓 메세지 */
   useEffect(() => {
-    roomSocket?.on('bye', (message: { nickname: string; socketId: string }) => {
-      console.log('someone lefted !');
-      setChatArray((prev: messageInterface[]) => [
-        ...prev,
-        { message: `${message.nickname} lefted!`, type: 'notice' },
-      ]);
-      setPeerConnectionState((prev) => ({
-        ...prev,
-        myPeerStream: null,
-      }));
-    });
+    roomSocket?.on(
+      'bye',
+      (message: { myPeersNickname: string; socketId: string }) => {
+        console.log('someone lefted !');
+        setChatArray((prev: messageInterface[]) => [
+          ...prev,
+          { message: `${message.myPeersNickname} lefted!`, type: 'notice' },
+        ]);
+        setPeerConnectionState((prev) => ({
+          ...prev,
+          myPeersStream: {},
+        }));
+      }
+    );
     return () => {
       roomSocket?.off(SOCKET_EVENT.WELCOME_USER);
       roomSocket?.off('bye');

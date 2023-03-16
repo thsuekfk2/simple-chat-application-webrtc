@@ -82,18 +82,18 @@ io.on('connection', (socket) => {
   });
 
   //offer을 받으면 offer 전송
-  socket.on('offer', (offer, roomName) => {
-    socket.to(roomName).emit('offer', offer);
+  socket.on('offer', (offer, roomName, socketId) => {
+    socket.to(roomName).emit('offer', { offer: offer, socketId: socketId });
   });
 
   //answer을 받으면 answer 전송
-  socket.on('answer', (answer, roomName) => {
-    socket.to(roomName).emit('answer', answer);
+  socket.on('answer', (answer, roomName, socketId) => {
+    socket.to(roomName).emit('answer', { answer: answer, socketId: socketId });
   });
 
   //icecandidate 받으면 icecandidate 전송
-  socket.on('ice', (ice, roomName) => {
-    socket.to(roomName).emit('ice', ice);
+  socket.on('ice', (ice, roomName, socketId) => {
+    socket.to(roomName).emit('ice', { ice: ice, socketId: socketId });
   });
 });
 

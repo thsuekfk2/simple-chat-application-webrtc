@@ -7,7 +7,8 @@ import peerConnectState from '../store/peerConnectState';
 
 export const usePeerConnection = (roomName?: string | null) => {
   const { myMediaStream } = useRecoilValue(mediaStreamState);
-  const { myPeerConnection, myPeerStream } = useRecoilValue(peerConnectState);
+  const { myPeerConnection, myPeersStream, myPeersSocketId } =
+    useRecoilValue(peerConnectState);
   const [peerConnectionState, setPeerConnectionState] =
     useRecoilState(peerConnectState);
 
@@ -27,7 +28,7 @@ export const usePeerConnection = (roomName?: string | null) => {
 
   useEffect(() => {
     //피어간의 연결 통로를 만든다.
-    const createPeerConnection = () => {
+    const createPeerConnection = (socketId: string) => {
       if (!myMediaStream?.id) {
         console.log('myMediaStream does not exist.');
       }
@@ -36,14 +37,18 @@ export const usePeerConnection = (roomName?: string | null) => {
 
       RTCpeerConnection.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
         console.log('emit ice');
-        roomSocket?.emit('ice', event.candidate, roomName);
+        roomSocket?.emit('ice', event.candidate, roomName, socketId);
       };
 
       RTCpeerConnection.ontrack = (event: RTCTrackEvent) => {
         console.log('got an event from my peer');
+        console.log(event.streams[0]);
         setPeerConnectionState((prev) => ({
           ...prev,
-          myPeerStream: event.streams[0],
+          myPeersStream: {
+            ...prev.myPeersStream,
+            [socketId]: event.streams[0],
+          },
         }));
       };
 
@@ -60,18 +65,21 @@ export const usePeerConnection = (roomName?: string | null) => {
 
       setPeerConnectionState((prev) => ({
         ...prev,
-        myPeerConnection: RTCpeerConnection,
+        myPeerConnection: {
+          ...prev.myPeerConnection,
+          [socketId]: RTCpeerConnection,
+        },
       }));
 
       return RTCpeerConnection;
     };
 
-    const onNewUser = async () => {
-      await createOffer();
+    const onNewUser = async (socketId: string) => {
+      await createOffer(socketId);
     };
 
-    const createOffer = async () => {
-      const RTCpeerConnection = createPeerConnection();
+    const createOffer = async (socketId: string) => {
+      const RTCpeerConnection = createPeerConnection(socketId);
       if (RTCpeerConnection) {
         //offer생성
         const offer = await RTCpeerConnection.createOffer({
@@ -84,63 +92,86 @@ export const usePeerConnection = (roomName?: string | null) => {
         );
         console.log('create offer');
         //offer을 다른 피어에게 보냄 (offer가 주고 받아지는 순간 직접적인 대화 가능)
-        roomSocket?.emit('offer', offer, roomName);
+        roomSocket?.emit('offer', offer, roomName, socketId);
         console.log('offer emit');
       }
     };
 
     // create answer to offer
-    const createAnswer = async (offer: RTCSessionDescriptionInit) => {
-      if (myMediaStream?.id) {
-        const RTCpeerConnection = createPeerConnection();
-        if (RTCpeerConnection) {
-          //전달받은 offer을 가지고 remoteDescription설정
-          await RTCpeerConnection.setRemoteDescription(
-            new RTCSessionDescription(offer)
-          );
-          //answer 생성
-          const answer = await RTCpeerConnection.createAnswer();
-          console.log('create answer');
-          //생성된 answer을 가지고 setLocalDescription 설정
-          await RTCpeerConnection.setLocalDescription(answer);
-          // send answer to other user
-          console.log('emit answer');
-          roomSocket?.emit('answer', answer, roomName);
-        }
+    const createAnswer = async (
+      offer: RTCSessionDescriptionInit,
+      socketId: string
+    ) => {
+      console.log('인기쟁이가 받는 소켓', socketId);
+      const RTCpeerConnection = createPeerConnection(socketId);
+      if (RTCpeerConnection) {
+        //전달받은 offer을 가지고 remoteDescription설정
+
+        await RTCpeerConnection.setRemoteDescription(
+          new RTCSessionDescription(offer)
+        );
+        //answer 생성
+        const answer = await RTCpeerConnection.createAnswer();
+        console.log('create answer');
+        //생성된 answer을 가지고 setLocalDescription 설정
+        await RTCpeerConnection.setLocalDescription(answer);
+        // send answer to other user
+        console.log('emit answer');
+        roomSocket?.emit('answer', answer, roomName, socketId);
       }
     };
 
     // handle answer made from other user
-    const onAnswer = async (answer: RTCSessionDescriptionInit) => {
+    const onAnswer = async (message: {
+      answer: RTCSessionDescriptionInit;
+      socketId: string;
+    }) => {
       console.log('on Answer');
+      console.log('혹쉬', myPeerConnection[message.socketId].signalingState);
       //전달받은 answer을 가지고 setRemoteDescription 설정
-      myPeerConnection?.setRemoteDescription(new RTCSessionDescription(answer));
+      myPeerConnection[message.socketId]?.setRemoteDescription(
+        new RTCSessionDescription(message.answer)
+      );
     };
 
     // handle offer from new user
-    const onOffer = async (offer: RTCSessionDescriptionInit) => {
+    const onOffer = async (message: {
+      offer: RTCSessionDescriptionInit;
+      socketId: string;
+    }) => {
+      setPeerConnectionState((prev) => ({
+        ...prev,
+        myPeersSocketId: message.socketId,
+      }));
+
       console.log('on offer');
-      await createAnswer(offer);
+      await createAnswer(message.offer, message.socketId);
     };
 
     // handle ice-candidate from other user
     //offer와 answer 받는것을 모두 끝냈을 때, peer-to-peer연결의 양쪽 끝에서 icecandidate라는 이벤트 실행
-    const onIceCandidateReceived = (candidate: RTCIceCandidateInit) => {
-      console.log('on ice');
-      if (candidate && myPeerConnection?.iceConnectionState) {
-        myPeerConnection?.addIceCandidate(candidate);
+    const onIceCandidateReceived = (message: {
+      ice: RTCIceCandidateInit;
+      socketId: string;
+    }) => {
+      console.log('onononice');
+      if (message.ice && myPeerConnection[message.socketId]) {
+        myPeerConnection[message.socketId]?.addIceCandidate(message.ice);
       }
     };
 
     roomSocket?.on(
       SOCKET_EVENT.WELCOME_USER,
       (message: { nickname: string; socketId: string }) => {
-        onNewUser();
+        onNewUser(message.socketId);
         console.log('onNewUser');
         setPeerConnectionState((prev) => ({
           ...prev,
-          nickname: message.nickname,
-          socketId: message.socketId,
+          myPeersNickname: {
+            ...prev.myPeersNickname,
+            [message.socketId]: message.nickname,
+          },
+          myPeersSocketId: message.socketId,
         }));
       }
     );
@@ -148,17 +179,12 @@ export const usePeerConnection = (roomName?: string | null) => {
     roomSocket?.on('answer', onAnswer);
     roomSocket?.on('ice', onIceCandidateReceived);
 
+    console.log('peerConnectionState', peerConnectionState);
     return () => {
       roomSocket?.off(SOCKET_EVENT.WELCOME_USER);
       roomSocket?.off('offer');
       roomSocket?.off('answer');
       roomSocket?.off('ice');
     };
-  }, [
-    myMediaStream,
-    myPeerConnection,
-    myPeerStream,
-    roomName,
-    peerConnectionState,
-  ]);
+  }, [myPeerConnection]);
 };

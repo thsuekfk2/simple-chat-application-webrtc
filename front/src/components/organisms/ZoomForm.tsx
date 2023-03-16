@@ -12,7 +12,7 @@ export const ZoomForm = () => {
   const peerRef = useRef<HTMLVideoElement | null>(null);
 
   const { myMediaStream } = useRecoilValue(mediaStreamState);
-  const { myPeerStream } = useRecoilValue(peerConnectState);
+  const { myPeersStream, myPeersSocketId } = useRecoilValue(peerConnectState);
 
   const { toggleAudioStream, toggleVideoStream } = useCreateMediaStream();
 
@@ -23,17 +23,21 @@ export const ZoomForm = () => {
   }, [myMediaStream, videoRef]);
 
   useEffect(() => {
-    if (peerRef.current && myPeerStream?.id) {
-      console.log('myPeerStream', myPeerStream);
-      peerRef.current.srcObject = myPeerStream;
+    if (peerRef.current && myPeersStream[myPeersSocketId]?.id) {
+      peerRef.current.srcObject = myPeersStream[myPeersSocketId];
     }
-  }, [myPeerStream, peerRef]);
+  }, [myPeersStream, myPeersSocketId]);
 
   return (
     <div className="flex  flex-col justify-between flex-1 bg-gray-dark w-full h-full md:min-w-[300px] ">
-      <div className="flex w-full justify-center h-full">
-        <Cam videoRef={videoRef} participants={myPeerStream?.id ? 2 : 1} />
-        {myPeerStream?.id && <Cam videoRef={peerRef} participants={2} />}
+      <div className="flex w-full justify-center h-full min-w[300px] flex-wrap">
+        <Cam
+          videoRef={videoRef}
+          participants={myPeersStream[myPeersSocketId]?.id ? 2 : 1}
+        />
+        {myPeersStream[myPeersSocketId]?.id && (
+          <Cam videoRef={peerRef} participants={2} />
+        )}
       </div>
       <div className="flex h-[50px] bg-subColor justify-center items-center">
         <SoundIcon toggleClick={toggleAudioStream} />
