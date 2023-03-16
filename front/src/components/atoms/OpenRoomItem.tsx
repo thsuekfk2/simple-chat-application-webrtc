@@ -10,6 +10,10 @@ export const OpenRoomItem = ({ room }: Props) => {
   const navigate = useNavigate();
 
   const enterRoom = (roomName?: string | null) => {
+    if (room?.roomCount === 2) {
+      alert('인원이 다 찼어요 😢');
+      return;
+    }
     //디바이스 세팅 페이지 진입
     navigate(`/setting`, {
       state: {
@@ -25,7 +29,7 @@ export const OpenRoomItem = ({ room }: Props) => {
     >
       <Avatar roomId={room?.roomName} />
       <div className=" text-xl pb-3 pt-2">{room?.roomName}</div>
-      <div>{`${room?.roomCount} 명 참여중`}</div>
+      <div>{`${room?.roomCount} / 2 명 참여중`}</div>
     </div>
   );
 };

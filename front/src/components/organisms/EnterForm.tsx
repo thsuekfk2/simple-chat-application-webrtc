@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { InputButton } from '../molecules/InputButton';
 import { generateSocket } from '../../adapters/roomSocket';
 import { useNavigate } from 'react-router-dom';
+import { BounceIcon } from '../atoms/BounceIcon';
 
 export const EnterForm = () => {
   const navigate = useNavigate();
@@ -33,7 +34,9 @@ export const EnterForm = () => {
 
   return (
     <div className=" absolute flex h-full flex-col items-center justify-center gap-4 w-[300px]">
-      <div className="text-xl font-bold pb-5">Welcome 👋</div>
+      <div className="flex text-xl font-bold pb-5">
+        Welcome <BounceIcon icon={'☺'} />
+      </div>
       <InputButton
         inputLabel="Room name"
         value={inputRoomName}

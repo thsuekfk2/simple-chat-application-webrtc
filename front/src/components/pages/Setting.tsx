@@ -7,10 +7,8 @@ import { useCreateMediaStream } from '../../hooks/useCreateMediaStream';
 import mediaStreamState from '../../store/mediaStreamState';
 import { Button } from '../atoms/Button';
 import { Cam } from '../atoms/Cam';
-import { SoundIcon } from '../atoms/SoundIcon';
-import { SwapIcon } from '../atoms/SwapIcon';
-import { BsFillCameraVideoOffFill, BsCameraVideoFill } from 'react-icons/bs';
 import { LabelInput } from '../atoms/LabelInput';
+import { ZoomMenuBar } from '../molecules/ZoomMenuBar';
 
 export const Setting = () => {
   const navigate = useNavigate();
@@ -18,7 +16,7 @@ export const Setting = () => {
   const { createStream } = useCreateMediaStream();
 
   const { myMediaStream } = useRecoilValue(mediaStreamState);
-  const { toggleAudioStream, toggleVideoStream } = useCreateMediaStream();
+
   const [inputNickname, setNickname] = useState('');
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
@@ -30,12 +28,14 @@ export const Setting = () => {
     if (videoRef.current && myMediaStream?.id) {
       videoRef.current.srcObject = myMediaStream;
     }
+    return () => {
+      if (videoRef.current) videoRef.current.srcObject = null;
+    };
   }, [myMediaStream, videoRef]);
 
   // 룸 페이지 진입
   const roomPage = () => {
     roomSocket?.emit(SOCKET_EVENT.SAVE_NICKNAME, inputNickname);
-
     joinRoom(state.roomName);
     navigate(`/room?roomName=${state.roomName}`);
   };
@@ -57,19 +57,12 @@ export const Setting = () => {
             <div className="h-[150px] flex justify-center">
               <Cam videoRef={videoRef} participants={1} />
             </div>
-            <div className="flex justify-center">
-              <SoundIcon toggleClick={toggleAudioStream} />
-              <SwapIcon
-                on={<BsCameraVideoFill />}
-                off={<BsFillCameraVideoOffFill />}
-                toggleClick={toggleVideoStream}
-              />
-            </div>
+            <ZoomMenuBar />
           </div>
           <LabelInput
             label={'your name'}
             value={inputNickname || ''}
-            onChange={(e) => onNicknameChange(e)}
+            onChange={onNicknameChange}
           />
         </div>
         <div className="w-full flex justify-center p-5">

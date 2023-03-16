@@ -1,4 +1,3 @@
-import React from 'react';
 import messageInterface from '../../../interface/message.interface';
 
 interface Props {

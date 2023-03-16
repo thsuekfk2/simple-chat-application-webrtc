@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import messageInterface from '../../interface/message.interface';
 import { getNowTime } from '../../utils/getDate';
 

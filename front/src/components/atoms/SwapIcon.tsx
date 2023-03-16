@@ -1,4 +1,3 @@
-import React from 'react';
 interface Props {
   on: JSX.Element | string;
   off: JSX.Element | string;

@@ -1,5 +1,3 @@
-import React from 'react';
-
 export const SoundIcon = ({ toggleClick }: { toggleClick: () => void }) => {
   return (
     <label className="swap mr-5">

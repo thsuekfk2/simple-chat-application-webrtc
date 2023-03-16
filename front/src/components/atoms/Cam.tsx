@@ -2,7 +2,7 @@ import { RefObject } from 'react';
 
 interface Props extends React.VideoHTMLAttributes<HTMLVideoElement> {
   videoRef: RefObject<HTMLVideoElement>;
-  participants: number;
+  participants: number | null;
 }
 
 export const Cam = ({ videoRef, participants, ...rest }: Props) => {
@@ -13,7 +13,7 @@ export const Cam = ({ videoRef, participants, ...rest }: Props) => {
       autoPlay
       playsInline
       {...rest}
-      className={participants != 1 ? 'w-[50%]' : 'max-w-[90%]'}
+      className={participants != 1 ? 'w-[50%] min-w-[300px]' : 'max-w-[90%]'}
     />
   );
 };

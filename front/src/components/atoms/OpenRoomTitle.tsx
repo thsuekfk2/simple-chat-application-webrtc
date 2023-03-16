@@ -1,4 +1,3 @@
-import React from 'react';
 import roomListInterface from '../../interface/room.interface';
 
 interface Props {
